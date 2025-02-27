@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Import config variables
 source config
 
@@ -7,15 +9,16 @@ source config
 function install_system {
     echo -e "\n${green_back}Installing ${bold}$system...${reset}"
 
-    (cd ./systems/$1; git init .)
-    (cd ./systems/$1; git remote add origin git@github.com:djulitro/$1.git)
-    (cd ./systems/$1; git fetch)
+    echo $1
+    (cd ./systems; git clone https://github.com/djulitro/$1.git)
+
+    # Esperar hasta que el repositorio haya sido clonado
+    while [ ! -d "./systems/$1" ]; do
+        sleep 1  # Espera 1 segundo antes de volver a comprobar
+    done
+
     (cd ./systems/$1; git checkout $branch)
     (cd ./systems/$1; git config core.fileMode false)
-
-    if [ $1 = "webapp" ]; then
-        cp ./systems/$1/docker.env.example ./systems/$1/docker.env
-    fi
 
     if [ $1 = "gymbro-backend" ] || [ $1 = "gymbro-frontend" ]; then
         cp ./systems/$1/.env.example ./systems/$1/.env
@@ -25,11 +28,8 @@ function install_system {
 }
 
 function update_alias {
-    # Delete all the system's previous aliases.
-    sed -i "/alias ${1}=/d" ~/.bash_aliases
-
     # Create alias.
-    echo "alias ${1}='${sudoAlias}docker exec -it ${1}'" >> ~/.bash_aliases
+    echo "alias ${1}='sudo docker exec -it ${1}'" >> ~/.bash_aliases
     echo -e "${green_bold}${1}${reset} ${green}alias updated.${reset}"
 }
 
@@ -45,14 +45,6 @@ function system_is_real {
 ###################
 # Starting point
 ###################
-# Check if every system folder exists.
-for system in "${systems[@]}"
-    do
-        if [ ! -d "./systems/$system" ]; then
-            mkdir ./systems/$system
-        fi
-    done
-
 # Menu
 echo -e "\nHi traveler, first of all... ${bold}do you need sudo with docker-compose?${reset}"
 printf "yes or no: "
@@ -66,7 +58,8 @@ echo -e "2) Update aliases"
 printf "Choose: "
 read -r option
 
-# Execute option selected
+# # Execute option selected
+
 if [ $option -ge 1 ]; then
     echo -e "\nSystems available: ${green_bold}${systems[*]}${reset}"
     printf "Choose (eg. gymbro-backend gymbro-frontend): "

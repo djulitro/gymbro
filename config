@@ -15,7 +15,7 @@ reset='\033[0m'
 sudo=""
 
 # Default branch repository
-branch="main"
+branch="production"
 
 # Systems list
 systems=(gymbro-backend gymbro-frontend)
