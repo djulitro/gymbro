@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Colors
+bold='\033[1m'
+green='\033[0;32m'
+green_bold='\033[1;32m'
+green_back='\033[42m'
+orange='\033[0;33m'
+orange_bold='\033[1;33m'
+red='\033[0;31m'
+red_bold='\033[1;31m'
+reset='\033[0m'
+
+# Does the user use sudo with docker-compose
+sudo=""
+
+# Default branch repository
+branch="main"
+
+# Systems list
+systems=(gymbro-backend gymbro-frontend)
